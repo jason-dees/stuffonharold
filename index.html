@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+    <title>Stuff on Harold</title>
+    <style type="text/css">
+        body{
+            margin:0px;
+        }
+        #another{
+            position:fixed;
+            right:50px;
+            bottom:50px;
+            font-size:2em;
+        }
+    </style>
+    </head>
+    <body>
+    <div id="Width"></div>
+    <img src="" style="width:100%;" id="harold"/>
+    <button id="another">Another!</button> 
+    <script>
+        var current = -1;
+        var hasStarted = false;
+        var img = [ 
+            /*'img\/1.jpg', 
+            'img\/2.jpg', 
+            'img\/3.jpg',
+            'img\/4.jpg',
+            'img\/5.jpg',
+            'img\/6.jpg',
+            'img\/7.jpg',
+            'img\/8.jpg',*/
+                ];
+        function start(imgs){
+            var haroldImage = document.getElementById('harold');
+            img = imgs;
+            hasStarted = true;
+            var imageLoading = false;
+            haroldImage.onload=function(){
+               imageLoading = false; 
+            }
+            function aHarold(){
+                if(imageLoading){return;}
+                imageLoading = true;
+                //document.getElementById('harold').src = 'img/' +
+                var rand = Math.floor(Math.random()*img.length) ;
+                if(rand==current){
+                    rand++;
+                    if(rand>=img.length){
+                        rand = 0;
+                    }
+                }
+                current = rand;
+                haroldImage.src = '' + img[rand];
+            }
+            aHarold();
+            document.getElementById('another').onclick=aHarold;
+        var prevPosition = null;
+        var shakeCountX = 0;
+        var hasShaken = false;
+        window.addEventListener('devicemotion',function(e){
+            var accel = e.acceleration;
+            var x = Math.abs(accel.x);
+            var y = Math.abs(accel.y);
+            var z = Math.abs(accel.z);
+            if(y>15){
+                shakeCountX++;
+            }
+            else{
+                shakeCountX = 0;
+            }
+            if(shakeCountX<3 && y >15 && !hasShaken){
+                hasShaken = true;
+                setTimeout(function(){hasShaken = false;},200);
+                aHarold();
+            }
+        });
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function(){
+            start(JSON.parse(this.responseText));
+        }
+        xhr.open("get", "images.php", true);
+        xhr.send();
+    </script>
+    </body>
+    </html>
