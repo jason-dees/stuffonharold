@@ -64,6 +64,7 @@
         var rowTemplate = document.querySelector("#stuff_row");
 
         stuff.sort(sortStuff);
+
         for(var i = 0; i< stuff.length; i++){
             var thing = stuff[i];
             total += parseFloat(thing.weight);
@@ -74,6 +75,12 @@
         }
 
         document.querySelector('#total_stuff_weight').innerHTML = total + "g";
+        document.querySelector('#interesting').onclick = function(){
+            document.querySelector('#stats_view').className = 'hidden';
+        }
+    }
+    document.querySelector('#stats').onclick = function(){
+        document.querySelector('#stats_view').className = '';
     }
     function sortStuff(a, b){
         var nameA = a.name.toUpperCase(); 
