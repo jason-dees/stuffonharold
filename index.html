@@ -6,83 +6,93 @@
     <style type="text/css">
         body{
             margin:0px;
+            font-family: sans-serif;
+        }
+        button{
+            font-size:5em;
+            
         }
         #another{
             position:fixed;
             right:50px;
             bottom:50px;
-            font-size:5em;
+        }
+        #stats{
+            position:fixed;
+            left:50px;
+            bottom:50px;
+        }
+        #stats_view{
+            display:block;
+            position:absolute;
+            width: 86%;
+            top:0px;
+            background-color:white;
+            margin:5%;
+            padding:2%;
+            border-radius: 5px;
+            box-shadow: 0px 0px 20px 5px black;
+        }
+        #stats_view table{
+            font-size:3em;
+            width:100%;
+        }
+        #stats_view table th{
+            text-align: left;
+        }
+        #stats_view table td{
+            text-align: right;
+        }
+        #stats_view table tbody{
+            font-size: .9em;
+        }
+        #stats_view table tbody tr * {
+            border-bottom: 1px solid black;
         }
     </style>
     </head>
     <body>
-    <div id="Width"></div>
-    <img src="" style="width:100%;" id="harold"/>
-    <button id="another">Another!</button> 
-    <script>
-        var current = -1;
-        var hasStarted = false;
-        var img = [ 
-            /*'img\/1.jpg', 
-            'img\/2.jpg', 
-            'img\/3.jpg',
-            'img\/4.jpg',
-            'img\/5.jpg',
-            'img\/6.jpg',
-            'img\/7.jpg',
-            'img\/8.jpg',*/
-                ];
-        function start(imgs){
-            var haroldImage = document.getElementById('harold');
-            img = imgs;
-            hasStarted = true;
-            var imageLoading = false;
-            haroldImage.onload=function(){
-               imageLoading = false; 
-            }
-            function aHarold(){
-                if(imageLoading){return;}
-                imageLoading = true;
-                //document.getElementById('harold').src = 'img/' +
-                var rand = Math.floor(Math.random()*img.length) ;
-                if(rand==current){
-                    rand++;
-                    if(rand>=img.length){
-                        rand = 0;
-                    }
-                }
-                current = rand;
-                haroldImage.src = '' + img[rand];
-            }
-            aHarold();
-            document.getElementById('another').onclick=aHarold;
-        var prevPosition = null;
-        var shakeCountX = 0;
-        var hasShaken = false;
-        window.addEventListener('devicemotion',function(e){
-            var accel = e.acceleration;
-            var x = Math.abs(accel.x);
-            var y = Math.abs(accel.y);
-            var z = Math.abs(accel.z);
-            if(y>15){
-                shakeCountX++;
-            }
-            else{
-                shakeCountX = 0;
-            }
-            if(shakeCountX<3 && y >15 && !hasShaken){
-                hasShaken = true;
-                setTimeout(function(){hasShaken = false;},200);
-                aHarold();
-            }
-        });
-        }
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function(){
-            start(JSON.parse(this.responseText));
-        }
-        xhr.open("get", "images.php", true);
-        xhr.send();
-    </script>
+        <div id="Width"></div>
+        <img src="" style="width:100%;" id="harold"/>
+        <button id="another">Another!</button> 
+        <button id="stats">Stats</button>
+        <div id="stats_view">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>
+                            Harold's Total Weight
+                        </th>
+                        <td id="harold_weight">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Stuff's Total Weight
+                        </th>
+                        <td id="total_stuff_weight">
+                            
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <table>
+                <thead>
+                    <tr><th colspan="2">All The Stuff</th></tr>
+                </thead>
+                <tbody id="stuff_body">
+                </tbody>
+            </table>
+            <br>
+            <button>Interesting...</button>
+        </div>
+        <template id="stuff_row">
+            <tr>
+                <th class="item"></th>
+                <td class="weight"></td>
+            </tr>
+        </template>
+        <script type="text/javascript" src="stuffonharold.js"></script>
     </body>
     </html>
