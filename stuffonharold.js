@@ -2,32 +2,31 @@
     var haroldWeightLbs = 10.1;
     var current = -1;
     var hasStarted = false;
-    var img = [ ];
-    function start(imgs){
+    function start(){
         var haroldImage = document.querySelector('#harold');
-        img = imgs;
         hasStarted = true;
         var imageLoading = false;
-        haroldImage.onload=function(){
-        imageLoading = false; 
+        haroldImage.onload = function(){
+            imageLoading = false; 
         }
         function aHarold(){
-            if(imageLoading){return;}
+            if(imageLoading){ return; }
+            
+            fetch('/resize.php?width=' + window.screen.availWidth + '&height=' + window.screen.availHeight)
+                .then(response => response.blob())
+                .then(function(blob){
+                     haroldImage.src = URL.createObjectURL(blob);
+                     imageLoading = false;
+                });
             imageLoading = true;
-            var rand = Math.floor(Math.random()*img.length) ;
-            if(rand==current){
-                rand++;
-                if(rand>=img.length){
-                    rand = 0;
-                }
-            }
-            current = rand;
-            haroldImage.src = '' + img[rand];
         }
         aHarold();
-        document.querySelector('#another').onclick=aHarold;
+        document.querySelector('#another').onclick = aHarold;
         addMotionListener(aHarold);
     }
+
+    start();
+
     function addMotionListener(shakeEvent){
         var shakeCountX = 0;
         var hasShaken = false;
@@ -50,15 +49,9 @@
         });
 
     }
-    var imageXhr = new XMLHttpRequest();
-    imageXhr.onload = function(){
-        start(JSON.parse(this.responseText));
-    }
-    imageXhr.open("get", "images.php", true);
-    imageXhr.send();
 
-    function fillInStuff(){
-        var stuff = JSON.parse(this.responseText);
+    function fillInStuff(stuff){
+        console.log(stuff);
         var total = 0;
         var stuffTable = document.querySelector("#stuff_body");
         var rowTemplate = document.querySelector("#stuff_row");
@@ -94,10 +87,9 @@
         return 0;
     }
 
-    var stuffXhr = new XMLHttpRequest();
-    stuffXhr.onload = fillInStuff;
-    stuffXhr.open("get", "stuff.json", true);
-    stuffXhr.send();
+    fetch("stuff.json")
+        .then( response => response.json())
+        .then(json => fillInStuff(json));
 
     function setHaroldWeight(){
         document.querySelector('#harold_weight').innerHTML = poundsToGrams(haroldWeightLbs) + "g";
