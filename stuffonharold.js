@@ -48,10 +48,67 @@
             }
         });
 
+        return;
+        addSwipeListener();
     }
 
+    function addSwipeListener(){
+        var haroldImage = document.querySelector('#harold');
+        var start = {x: 0, y: 0};
+        var previous = {x: 0, y: 0};
+        var isDown = false;
+        var velocity = {x: 0, y: 0};
+
+        haroldImage.addEventListener('mousedown', function(e){
+            start = getPoint(e);
+            previous = start;
+            isDown = true;
+        });
+        haroldImage.addEventListener("dragstart", function(e){
+            e.preventDefault();
+        })
+        haroldImage.addEventListener("drag", function(e){
+            e.preventDefault();
+        })
+
+        haroldImage.addEventListener('mousemove', function(e){
+            if(isDown){
+                var current = getPoint(e);
+                var offset = calculateOffset(previous, current);
+                setOffsetPosition(haroldImage, offset);
+                previous = current;
+            }
+        });
+        haroldImage.addEventListener('mouseup', function(e){
+            isDown = false;
+        });
+
+        function calculateOffset(start, end){
+            return {x: start.x - end.x, y: start.y - end.y};
+        }
+        function getPoint(e){
+            return {x: e.pageX, y: e.pageY};
+        }
+
+        function setOffsetPosition(element, offset){
+            var position = getPosition(element);
+            element.style.position = "absolute";
+            element.style.left = (offset.x * -1 + position.x) + "px";
+            element.style.top = (offset.y * -1 + position.y) + "px";
+        }
+
+        function getPosition(element){
+            var rect = element.getBoundingClientRect();
+            return {x: rect.left, y: rect.top};
+        }
+
+        function setNewPosition(element, movement){
+            var position = getPosition(element);
+        }
+    }
+
+
     function fillInStuff(stuff){
-        console.log(stuff);
         var total = 0;
         var stuffTable = document.querySelector("#stuff_body");
         var rowTemplate = document.querySelector("#stuff_row");
@@ -72,9 +129,11 @@
             document.querySelector('#stats_view').className = 'hidden';
         }
     }
+
     document.querySelector('#stats').onclick = function(){
         document.querySelector('#stats_view').className = '';
     }
+
     function sortStuff(a, b){
         var nameA = a.name.toUpperCase(); 
         var nameB = b.name.toUpperCase();
@@ -100,4 +159,5 @@
         var onePound = 453.59;
         return pounds * 453.59;
     }
+
 })();
