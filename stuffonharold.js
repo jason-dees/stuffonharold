@@ -36,7 +36,7 @@
         var haroldQueue = new HaroldImageQueue(document.querySelector('#harolds'));
         document.querySelector('#another').onclick =  haroldQueue.shift.bind(haroldQueue);
         addMotionListener(haroldQueue.shift.bind(haroldQueue));
-        addSwipeListener(document.querySelector('#harolds'));
+        addSwipeListener(document.querySelector('#harolds'), haroldQueue.shift.bind(haroldQueue));
     }
 
     start();
@@ -66,13 +66,18 @@
         addSwipeListener();
     }
 
-    function addSwipeListener(harolds){
+    function addSwipeListener(harolds, nextEvent){
         
-        var haroldImage = () => harolds.firstChild;
-        var start = {x: 0, y: 0};
-        var previous = {x: 0, y: 0};
-        var isDown = false;
-        var velocity = {x: 0, y: 0};
+        let haroldImage = () => harolds.firstChild;
+        let start = {x: 0, y: 0};
+        let previous = {x: 0, y: 0};
+        let isDown = false;
+        let velocity = {x: 0, y: 0};
+        let nextAreaPadding = window.screen.availWidth * .1;
+        let nextArea = {
+            left: nextAreaPadding,
+            right: window.screen.availWidth - nextAreaPadding
+        };
 
         harolds.addEventListener('mousedown', function(e){
             start = getPoint(e);
@@ -89,13 +94,18 @@
         harolds.addEventListener('mousemove', function(e){
             if(isDown){
                 var current = getPoint(e);
+                if(isInNextPadding(current)){
+                    nextEvent();
+                    dragDone();
+                    return;
+                }
                 var offset = calculateOffset(previous, current);
                 setOffsetPosition(haroldImage(), offset);
                 previous = current;
             }
         });
         harolds.addEventListener('mouseup', function(e){
-            isDown = false;
+            dragDone();
         });
 
         function calculateOffset(start, end){
@@ -105,11 +115,22 @@
             return {x: e.pageX, y: e.pageY};
         }
 
+        function dragDone(){
+            isDown = false;
+            haroldImage().style.position = "relative";
+            haroldImage().style.left = "0px";
+            haroldImage().style.top = "0px";
+        }
+
         function setOffsetPosition(element, offset){
             var position = getPosition(element);
             element.style.position = "absolute";
             element.style.left = (offset.x * -1 + position.x) + "px";
-            element.style.top = (offset.y * -1 + position.y) + "px";
+            element.style.top = (offset.y * -1 + position.y + window.scrollY) + "px";
+        }
+
+        function setPosition(element, position){
+
         }
 
         function getPosition(element){
@@ -119,6 +140,10 @@
 
         function setNewPosition(element, movement){
             var position = getPosition(element);
+        }
+
+        function isInNextPadding(point){
+            return point.x > nextArea.right || point.x < nextArea.left;
         }
     }
 
