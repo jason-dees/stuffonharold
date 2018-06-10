@@ -1,28 +1,42 @@
 (function h(){
+    class HaroldImageQueue{
+        constructor(haroldsElement){
+            var self = this;
+            this.images = [];
+            this.length = 2;
+            this.parent = haroldsElement;
+            
+            this.addImageElement().then(() => self.addImageElement());
+        }
+
+        addImageElement() {
+            var self = this;
+
+            return fetch('/resize.php?width=' + window.screen.availWidth + '&height=' + window.screen.availHeight)
+                .then(response => response.blob())
+                .then(function(blob){
+                    var haroldImage = new Image();
+                    haroldImage.src = URL.createObjectURL(blob);
+                    self.images.push(haroldImage);
+                    self.parent.appendChild(haroldImage);
+                });
+        }
+
+        shift(){
+            var element = this.images.shift();
+            element.parentNode.removeChild(element);
+            this.addImageElement();
+        }
+    }
+
     var haroldWeightLbs = 10.1;
     var current = -1;
     var hasStarted = false;
     function start(){
-        var haroldImage = document.querySelector('#harold');
-        hasStarted = true;
-        var imageLoading = false;
-        haroldImage.onload = function(){
-            imageLoading = false; 
-        }
-        function aHarold(){
-            if(imageLoading){ return; }
-            
-            fetch('/resize.php?width=' + window.screen.availWidth + '&height=' + window.screen.availHeight)
-                .then(response => response.blob())
-                .then(function(blob){
-                     haroldImage.src = URL.createObjectURL(blob);
-                     imageLoading = false;
-                });
-            imageLoading = true;
-        }
-        aHarold();
-        document.querySelector('#another').onclick = aHarold;
-        addMotionListener(aHarold);
+        var haroldQueue = new HaroldImageQueue(document.querySelector('#harolds'));
+        document.querySelector('#another').onclick =  haroldQueue.shift.bind(haroldQueue);
+        addMotionListener(haroldQueue.shift.bind(haroldQueue));
+        addSwipeListener(document.querySelector('#harolds'));
     }
 
     start();
@@ -52,34 +66,35 @@
         addSwipeListener();
     }
 
-    function addSwipeListener(){
-        var haroldImage = document.querySelector('#harold');
+    function addSwipeListener(harolds){
+        
+        var haroldImage = () => harolds.firstChild;
         var start = {x: 0, y: 0};
         var previous = {x: 0, y: 0};
         var isDown = false;
         var velocity = {x: 0, y: 0};
 
-        haroldImage.addEventListener('mousedown', function(e){
+        harolds.addEventListener('mousedown', function(e){
             start = getPoint(e);
             previous = start;
             isDown = true;
         });
-        haroldImage.addEventListener("dragstart", function(e){
+        harolds.addEventListener("dragstart", function(e){
             e.preventDefault();
         })
-        haroldImage.addEventListener("drag", function(e){
+        harolds.addEventListener("drag", function(e){
             e.preventDefault();
         })
 
-        haroldImage.addEventListener('mousemove', function(e){
+        harolds.addEventListener('mousemove', function(e){
             if(isDown){
                 var current = getPoint(e);
                 var offset = calculateOffset(previous, current);
-                setOffsetPosition(haroldImage, offset);
+                setOffsetPosition(haroldImage(), offset);
                 previous = current;
             }
         });
-        haroldImage.addEventListener('mouseup', function(e){
+        harolds.addEventListener('mouseup', function(e){
             isDown = false;
         });
 
@@ -159,5 +174,4 @@
         var onePound = 453.59;
         return pounds * 453.59;
     }
-
 })();
