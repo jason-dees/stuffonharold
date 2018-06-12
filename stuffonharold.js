@@ -12,7 +12,8 @@
         addImageElement() {
             var self = this;
 
-            return fetch('/resize.php?width=' + window.screen.availWidth + '&height=' + window.screen.availHeight)
+            var badIdea = new Date();
+            return fetch('/resize.php?width=' + window.screen.availWidth + '&height=' + window.screen.availHeight +'&noo' + badIdea.getMilliseconds())
                 .then(response => response.blob())
                 .then(function(blob){
                     var haroldImage = new Image();
@@ -147,6 +148,9 @@
         }
     }
 
+    function addSideTapListener(harolds, nextEvent){
+
+    }
 
     function fillInStuff(stuff){
         var total = 0;
