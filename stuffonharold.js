@@ -13,7 +13,7 @@
             var self = this;
 
             var badIdea = new Date();
-            return fetch('/resize.php?width=' + window.screen.availWidth + '&height=' + window.screen.availHeight +'&noo' + badIdea.getMilliseconds())
+            return fetch('/resize.php?width=' + window.innerWidth + '&height=' + window.innerHeight +'&noo' + badIdea.getMilliseconds())
                 .then(response => response.blob())
                 .then(function(blob){
                     var haroldImage = new Image();
@@ -33,11 +33,14 @@
     var haroldWeightLbs = 10.1;
     var current = -1;
     var hasStarted = false;
+    var nextAreaPercent = .1;
     function start(){
-        var haroldQueue = new HaroldImageQueue(document.querySelector('#harolds'));
-        document.querySelector('#another').onclick =  haroldQueue.shift.bind(haroldQueue);
-        addMotionListener(haroldQueue.shift.bind(haroldQueue));
-        addSwipeListener(document.querySelector('#harolds'), haroldQueue.shift.bind(haroldQueue));
+        var harolds = document.querySelector('#harolds');
+        var haroldQueue = new HaroldImageQueue(harolds);
+        var nextHarold = haroldQueue.shift.bind(haroldQueue);
+        
+        addMotionListener(nextHarold);
+        addSwipeListener(harolds, nextHarold);
     }
 
     start();
@@ -74,25 +77,26 @@
         let previous = {x: 0, y: 0};
         let isDown = false;
         let velocity = {x: 0, y: 0};
-        let nextAreaPadding = window.screen.availWidth * .1;
+        let nextAreaPadding = window.innerWidth * nextAreaPercent;
         let nextArea = {
             left: nextAreaPadding,
-            right: window.screen.availWidth - nextAreaPadding
+            right: window.innerWidth - nextAreaPadding
         };
-
-        harolds.addEventListener('mousedown', function(e){
+        var startFn = function(e){
             start = getPoint(e);
             previous = start;
             isDown = true;
-        });
+        }
+        harolds.addEventListener('mousedown', startFn);
+        harolds.addEventListener('touchdown', startFn);
+
         harolds.addEventListener("dragstart", function(e){
             e.preventDefault();
         })
         harolds.addEventListener("drag", function(e){
             e.preventDefault();
         })
-
-        harolds.addEventListener('mousemove', function(e){
+        var downFn = function(e){
             if(isDown){
                 var current = getPoint(e);
                 if(isInNextPadding(current)){
@@ -104,9 +108,21 @@
                 setOffsetPosition(haroldImage(), offset);
                 previous = current;
             }
-        });
-        harolds.addEventListener('mouseup', function(e){
+        };
+        harolds.addEventListener('mousemove', downFn);
+        harolds.addEventListener('touchmove', downFn);
+
+        var upFn = function(e){
             dragDone();
+        }
+        harolds.addEventListener('mouseup', upFn);
+        harolds.addEventListener('touchend', upFn);
+        
+        harolds.addEventListener('click', function(e){
+            if(isInNextPadding(getPoint(e))){
+                dragDone();
+                nextEvent();
+            }
         });
 
         function calculateOffset(start, end){
@@ -130,10 +146,6 @@
             element.style.top = (offset.y * -1 + position.y + window.scrollY) + "px";
         }
 
-        function setPosition(element, position){
-
-        }
-
         function getPosition(element){
             var rect = element.getBoundingClientRect();
             return {x: rect.left, y: rect.top};
@@ -146,10 +158,6 @@
         function isInNextPadding(point){
             return point.x > nextArea.right || point.x < nextArea.left;
         }
-    }
-
-    function addSideTapListener(harolds, nextEvent){
-
     }
 
     function fillInStuff(stuff){
