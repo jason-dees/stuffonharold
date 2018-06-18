@@ -3,24 +3,37 @@
 }
 #harolds .harold-img:nth-child(2) {
   position: absolute;
+  width: 100%;
   top: 0;
   left: 0;
   z-index: -1;
   overflow: hidden;
+  filter: grayscale(1) blur(5px);
 }
-#harolds .harold-img.drag {
+#harolds .harold-img:first-child img {
+  animation: 0.1s sharpen;
+}
+#harolds .harold-img {
+  height: 100%;
+}
+#harolds .harold-img img {
+  box-shadow: 0 0 20px 5px #444;
   background-color: white;
   padding: 5%;
   padding-bottom: 10%;
+  max-width: 90%;
 }
-#harolds .harold-img {
-  box-shadow: 0 0 20px 5px #444;
-  width: 100%;
-  height: 100%;
+
+@keyframes sharpen {
+  from {
+    filter: grayscale(1) blur(5px);
+  }
+  to {
+    filter: none;
+  }
 }
 #stats {
   position: fixed;
-  left: 5%;
   bottom: 5%;
 }
 
@@ -69,17 +82,10 @@ body {
   margin: 0;
   font-family: sans-serif;
   overflow-x: hidden;
-  background-color: #555;
+  background-color: #aaa;
+  text-align: center;
 }
 
-@keyframes in_next_area {
-  from {
-    transform: rotateY(0deg);
-  }
-  to {
-    transform: rotateY(25deg);
-  }
-}
 @keyframes in_next_area {
   from {
     transform: rotateY(25deg);

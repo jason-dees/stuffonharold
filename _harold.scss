@@ -5,22 +5,37 @@
 
     .harold-img:nth-child(2){
         position: absolute;
+        width:100%;
         top:0;
         left:0;
         z-index: -1;
         overflow: hidden;
+        filter: grayscale(1) blur(5px);
+        img{
+        }
+    }
+    .harold-img:first-child img{
+        animation: .1s sharpen;
     }
     .harold-img.drag{
-        background-color: white;
-        padding:5%;
-        padding-bottom:10%;
     }
     .harold-img {
-        box-shadow: 0 0 20px 5px #444;
         height:100%;
         img{
-
+            box-shadow: 0 0 20px 5px #444;
+            background-color: white;
+            padding:5%;
+            padding-bottom:10%;
+            max-width:90%;
         }
+    }
+}
+@keyframes sharpen{
+    from {
+        filter: grayscale(1) blur(5px);
+    }
+    to {
+        filter: none;
     }
 }
 // #harolds .harold-img.out_next_area {

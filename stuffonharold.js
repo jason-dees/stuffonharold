@@ -137,10 +137,8 @@
         };
         addEventListener(harolds, ['mousemove', 'touchmove'], downFn);
 
-        var upFn = function(e){
-            dragDone();
-        }
-        addEventListener(harolds, ['mouseup', 'touchend'], upFn);
+        //TODO: Large images resize to smaller images on drag
+        addEventListener(harolds, ['mouseup', 'touchend'], dragDone);
         addEventListener(harolds, 'click', function(e){
             if(isInNextPadding(getPoint(e))){
                 dragDone();
