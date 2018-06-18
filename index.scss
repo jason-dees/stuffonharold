@@ -2,31 +2,14 @@ $transform-degree : rotateY(25deg);
 $transform-rotate-duration: 1s;
 $button-padding: 5%;
 
+@import 'harold';
+@import 'stats';
+
 body{
     margin:0;
     font-family: sans-serif;
     overflow-x:hidden;
-    background-color:#ddd;
-}
-img{
-    box-shadow: 0 0 20px 5px #444;
-    width:100%;
-}
-#harolds img:nth-child(2){
-    position: absolute;
-    top:0;
-    left:0;
-    z-index: -1;
-}
-#harolds img.out_next_area {
-    animation-name: out_next_area;
-    animation-duration: $transform-rotate-duration;
-    transform: rotateY(0deg);
-}
-#harolds img.in_next_area {
-    animation-name: in_next_area;
-    animation-duration: $transform-rotate-duration;
-    transform: $transform-degree;
+    background-color:#555;
 }
 @keyframes in_next_area{
     from {transform: rotateY(0deg);}
@@ -49,51 +32,9 @@ button{
     padding:10px;
     font-weight: bold;
 }
-#another{
+#event{
     position:fixed;
     right:$button-padding;
     bottom:$button-padding;
-}
-#stats{
-    position:fixed;
-    left:$button-padding;
-    bottom:$button-padding;
-}
-#stats_view.hidden{
-    display: none;
-}
-#stats_view{
-    display:block;
-    position:absolute;
-    width: 86%;
-    top:0;
-    left:0;
     background-color:white;
-    margin:5%;
-    padding:2%;
-    border-radius: 5px;
-    box-shadow: 0 0 20px 5px black;
-    transition-property: all;
-    transition-duration: .5s;
-    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-}
-#stats_view table{
-    font-size:3em;
-    width:100%;
-}
-#stats_view table th{
-    text-align: left;
-}
-thead th{
-    font-size:1.25em;
-}
-#stats_view table td{
-    text-align: right;
-    color: black;
-}
-#stats_view table tbody{
-    font-size: 1em;
-}
-#stats_view table tbody tr * {
-    border-bottom: 1px solid black;
 }

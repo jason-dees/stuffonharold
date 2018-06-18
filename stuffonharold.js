@@ -1,4 +1,27 @@
 (function h(){
+    class HaroldImg {
+
+        constructor() {
+            var element = document.createElement('div');
+            element.classList.add('harold-img');
+            this.Image = new Image();
+            element.appendChild(this.Image);
+
+            this.Element = element;
+        } 
+
+        remove(){
+            this.Element.parentNode.removeChild(this.Element);
+        }
+
+        set src(newSrc){
+            this.Image.src = newSrc;
+        }
+        get src(){
+            return this.Image.src;
+        }
+    }
+
     class HaroldImageQueue{
         constructor(haroldsElement){
             var self = this;
@@ -15,30 +38,32 @@
             var badIdea = new Date();
             return fetch('/resize.php?width=' + window.innerWidth + '&height=' + window.innerHeight +'&noo' + badIdea.getMilliseconds())
                 .then(response => response.blob())
-                .then(function(blob){
-                    var haroldImage = new Image();
-                    haroldImage.src = URL.createObjectURL(blob);
-                    self.images.push(haroldImage);
-                    self.parent.appendChild(haroldImage);
-                });
+                .then(self.addNewHarold.bind(self));
         }
 
         shift(){
             var element = this.images.shift();
-            element.parentNode.removeChild(element);
+            element.remove();
             this.addImageElement();
+        }
+        addNewHarold(blob){
+            var self = this;
+            var haroldImage = new HaroldImg();
+            haroldImage.src = URL.createObjectURL(blob);
+            self.images.push(haroldImage);
+            self.parent.appendChild(haroldImage.Element);
         }
     }
 
     var haroldWeightLbs = 10.1;
     var current = -1;
     var hasStarted = false;
-    var nextAreaPercent = .1;
+    var nextAreaPercent = .05;
     function start(){
         var harolds = document.querySelector('#harolds');
         var haroldQueue = new HaroldImageQueue(harolds);
         var nextHarold = haroldQueue.shift.bind(haroldQueue);
-        
+
         addMotionListener(nextHarold);
         addSwipeListener(harolds, nextHarold);
     }
@@ -83,19 +108,20 @@
             right: window.innerWidth - nextAreaPadding
         };
         var startFn = function(e){
+            if(isInNextPadding(getPoint(e))){
+                return;
+            }
+            e.preventDefault();
+            haroldImage().classList.add('drag');
             start = getPoint(e);
             previous = start;
             isDown = true;
         }
-        harolds.addEventListener('mousedown', startFn);
-        harolds.addEventListener('touchdown', startFn);
+        var preventDefault = function(e){ e.preventDefault();}
+        addEventListener(harolds, ['mousedown', 'touchstart'], startFn);
 
-        harolds.addEventListener("dragstart", function(e){
-            e.preventDefault();
-        })
-        harolds.addEventListener("drag", function(e){
-            e.preventDefault();
-        })
+        harolds.addEventListener("dragstart", preventDefault);
+        harolds.addEventListener("drag",preventDefault); 
         var downFn = function(e){
             if(isDown){
                 var current = getPoint(e);
@@ -109,16 +135,13 @@
                 previous = current;
             }
         };
-        harolds.addEventListener('mousemove', downFn);
-        harolds.addEventListener('touchmove', downFn);
+        addEventListener(harolds, ['mousemove', 'touchmove'], downFn);
 
         var upFn = function(e){
             dragDone();
         }
-        harolds.addEventListener('mouseup', upFn);
-        harolds.addEventListener('touchend', upFn);
-        
-        harolds.addEventListener('click', function(e){
+        addEventListener(harolds, ['mouseup', 'touchend'], upFn);
+        addEventListener(harolds, 'click', function(e){
             if(isInNextPadding(getPoint(e))){
                 dragDone();
                 nextEvent();
@@ -135,8 +158,9 @@
         function dragDone(){
             isDown = false;
             haroldImage().style.position = "relative";
-            haroldImage().style.left = "0px";
-            haroldImage().style.top = "0px";
+            haroldImage().style.left = "auto";
+            haroldImage().style.top = "auto";
+            haroldImage().classList.remove('drag');
         }
 
         function setOffsetPosition(element, offset){
@@ -186,6 +210,19 @@
         document.querySelector('#stats_view').className = '';
     }
 
+    function addEventListener(element, eventType, fn){
+        if(typeof(eventType) == "object"){
+            eventType.forEach(e => {
+                addEventListener(element, e, fn);
+            });
+            return;
+        }
+        element.addEventListener(eventType, function(e){
+            // console.log(eventType);
+            // document.getElementById('event').innerHTML = eventType;
+            fn(e);
+        });
+    }
     function sortStuff(a, b){
         var nameA = a.name.toUpperCase(); 
         var nameB = b.name.toUpperCase();
