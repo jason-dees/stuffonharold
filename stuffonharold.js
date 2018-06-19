@@ -1,4 +1,5 @@
 (function h(){
+    //Custom Elements don't work in Safari
     class HaroldImg {
 
         constructor() {
@@ -207,6 +208,11 @@
     document.querySelector('#stats').onclick = function(){
         document.querySelector('#stats_view').className = '';
     }
+    document.addEventListener("keydown", function(e){
+        if(e.keyCode == 27){
+            document.querySelector('#stats_view').className = 'hidden';
+        }
+    });
 
     function addEventListener(element, eventType, fn){
         if(typeof(eventType) == "object"){
